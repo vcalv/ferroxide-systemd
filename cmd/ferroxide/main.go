@@ -30,6 +30,7 @@ import (
 	"github.com/acheong08/ferroxide/imports"
 	"github.com/acheong08/ferroxide/protonmail"
 	smtpbackend "github.com/acheong08/ferroxide/smtp"
+	"github.com/acheong08/ferroxide/systemd"
 	"github.com/google/uuid"
 )
 
@@ -282,6 +283,7 @@ Commands:
 	serve			Run all servers
 	smtp			Run ferroxide as an SMTP server
 	status			View ferroxide status
+	systemd	<server>	Run server (carddav, caldav, imap or smtp) as a systemd socket service
 
 Environment variables:
 	HYDROXIDE_BRIDGE_PASS	Don't prompt for the bridge password, use this variable instead
@@ -663,6 +665,25 @@ func main() {
 		err = smtpbackend.SendMail(c, u, privateKeys, addrs, rcpt, os.Stdin)
 		if err != nil {
 			log.Fatal(err)
+		}
+	case "systemd":
+		systemd_cmd := flag.Arg(1)
+		switch systemd_cmd {
+		case "imap":
+			log.Println("Running IMAP in stdin/stdout")
+			authManager := auth.NewManager(newClient)
+			eventsManager := events.NewManager()
+			be := imapbackend.New(authManager, eventsManager)
+			s := imapserver.New(be)
+			log.Fatal(s.Serve(&systemd.StdinStdoutListener{}))
+		case "smtp":
+			log.Println("Running SMTP in stdin/stdout")
+			authManager := auth.NewManager(newClient)
+			be := smtpbackend.New(authManager)
+			s := smtp.NewServer(be)
+			log.Fatal(s.Serve(&systemd.StdinStdoutListener{}))
+		default:
+			fmt.Printf("Unknown server type \"%s\" to run in stdin/stdout\n", systemd_cmd)
 		}
 	default:
 		fmt.Print(usage)
