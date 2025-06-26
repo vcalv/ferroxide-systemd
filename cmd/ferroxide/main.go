@@ -123,7 +123,7 @@ func askPass(prompt string) ([]byte, error) {
 }
 
 func askBridgePass() (string, error) {
-	if v := os.Getenv("HYDROXIDE_BRIDGE_PASS"); v != "" {
+	if v := os.Getenv("FERROXIDE_BRIDGE_PASS"); v != "" {
 		return v, nil
 	}
 	b, err := askPass("Bridge password")
@@ -295,7 +295,7 @@ Commands:
 	systemd	<server>	Run server (carddav, caldav, imap or smtp) as a systemd socket service
 
 Environment variables:
-	HYDROXIDE_BRIDGE_PASS	Don't prompt for the bridge password, use this variable instead
+	FERROXIDE_BRIDGE_PASS	Don't prompt for the bridge password, use this variable instead
 
 `
 
