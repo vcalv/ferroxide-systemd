@@ -1,4 +1,4 @@
-module github.com/acheong08/ferroxide
+module github.com/vcalv/ferroxide-systemd
 
 go 1.23.0
 

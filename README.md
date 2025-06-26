@@ -6,6 +6,7 @@ Primary changes:
 - Caldav
 - Tor and proxies
 - Custom config directory
+- Systemd socket support
 
 # Original Hydroxide ReadMe
 
@@ -46,7 +47,7 @@ setup information.
 Start by installing ferroxide:
 
 ```shell
-go install github.com/acheong08/ferroxide/cmd/ferroxide@latest
+go install github.com/vcalv/ferroxide-systemd/cmd/ferroxide@latest
 ```
 
 Then you'll need to login to ProtonMail via ferroxide, so that ferroxide can

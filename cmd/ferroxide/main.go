@@ -21,18 +21,18 @@ import (
 	"github.com/emersion/go-smtp"
 	"golang.org/x/term"
 
-	"github.com/acheong08/ferroxide/auth"
-	"github.com/acheong08/ferroxide/caldav"
-	"github.com/acheong08/ferroxide/carddav"
-	"github.com/acheong08/ferroxide/config"
-	"github.com/acheong08/ferroxide/events"
-	"github.com/acheong08/ferroxide/exports"
-	imapbackend "github.com/acheong08/ferroxide/imap"
-	"github.com/acheong08/ferroxide/imports"
-	"github.com/acheong08/ferroxide/protonmail"
-	smtpbackend "github.com/acheong08/ferroxide/smtp"
-	"github.com/acheong08/ferroxide/systemd"
 	"github.com/google/uuid"
+	"github.com/vcalv/ferroxide-systemd/auth"
+	"github.com/vcalv/ferroxide-systemd/caldav"
+	"github.com/vcalv/ferroxide-systemd/carddav"
+	"github.com/vcalv/ferroxide-systemd/config"
+	"github.com/vcalv/ferroxide-systemd/events"
+	"github.com/vcalv/ferroxide-systemd/exports"
+	imapbackend "github.com/vcalv/ferroxide-systemd/imap"
+	"github.com/vcalv/ferroxide-systemd/imports"
+	stdinlistener "github.com/vcalv/ferroxide-systemd/net"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
+	smtpbackend "github.com/vcalv/ferroxide-systemd/smtp"
 )
 
 const (
@@ -680,13 +680,14 @@ func main() {
 
 		authManager := auth.NewManager(newClient)
 		eventsManager := events.NewManager()
-		listener := systemd.StdinStdoutListener{}
+		listener := stdinlistener.StdinStdoutListener{}
 
 		switch systemd_cmd {
 		case "imap":
 			log.Println("Running IMAP in stdin/stdout")
 			be := imapbackend.New(authManager, eventsManager)
 			s := imapserver.New(be)
+			s.AllowInsecureAuth = tlsConfig == nil // TODO TLS support
 			log.Fatal(s.Serve(&listener))
 		case "smtp":
 			log.Println("Running SMTP in stdin/stdout")

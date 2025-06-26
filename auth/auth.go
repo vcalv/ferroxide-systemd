@@ -13,8 +13,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/crypto/nacl/secretbox"
 
-	"github.com/acheong08/ferroxide/config"
-	"github.com/acheong08/ferroxide/protonmail"
+	"github.com/vcalv/ferroxide-systemd/config"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
 )
 
 func authFilePath() (string, error) {

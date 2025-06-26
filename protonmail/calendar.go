@@ -13,7 +13,7 @@ import (
 	"github.com/ProtonMail/go-crypto/openpgp"
 	"github.com/ProtonMail/go-crypto/openpgp/armor"
 	"github.com/ProtonMail/go-crypto/openpgp/packet"
-	"github.com/acheong08/ferroxide/utils"
+	"github.com/vcalv/ferroxide-systemd/utils"
 	"github.com/emersion/go-ical"
 )
 

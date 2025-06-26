@@ -1,4 +1,4 @@
-package systemd
+package stdinlistener
 
 import (
 	"fmt"

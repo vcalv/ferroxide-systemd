@@ -13,7 +13,7 @@ import (
 	"sync"
 
 	"github.com/ProtonMail/go-crypto/openpgp"
-	"github.com/acheong08/ferroxide/protonmail"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
 	"github.com/emersion/go-vcard"
 	"github.com/emersion/go-webdav/carddav"
 )

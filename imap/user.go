@@ -8,9 +8,9 @@ import (
 	"github.com/ProtonMail/go-crypto/openpgp"
 	"github.com/emersion/go-imap"
 	imapbackend "github.com/emersion/go-imap/backend"
-	"github.com/acheong08/ferroxide/events"
-	"github.com/acheong08/ferroxide/imap/database"
-	"github.com/acheong08/ferroxide/protonmail"
+	"github.com/vcalv/ferroxide-systemd/events"
+	"github.com/vcalv/ferroxide-systemd/imap/database"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
 )
 
 var systemMailboxes = []struct {
