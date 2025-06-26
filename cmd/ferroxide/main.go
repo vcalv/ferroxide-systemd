@@ -681,6 +681,7 @@ func main() {
 		authManager := auth.NewManager(newClient)
 		eventsManager := events.NewManager()
 		listener := stdinlistener.StdinStdoutListener{}
+		log.SetFlags(0)
 
 		switch systemd_cmd {
 		case "imap":
