@@ -1,0 +1,12 @@
+[Unit]
+Description=Ferroxide CalDAV oneshot server
+
+[Socket]
+ListenStream=8081
+Accept=yes
+ReusePort=yes
+MaxConnections=50
+MaxConnectionsPerSource=10
+
+[Install]
+WantedBy=sockets.target

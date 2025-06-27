@@ -5,9 +5,9 @@ import (
 	"encoding/binary"
 	"errors"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 
-	"github.com/emersion/hydroxide/protonmail"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
 )
 
 func serializeUID(uid uint32) []byte {

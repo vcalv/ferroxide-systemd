@@ -1,0 +1,12 @@
+[Unit]
+Description=Ferroxide IMAP oneshot server
+
+[Socket]
+ListenStream=1143
+Accept=yes
+ReusePort=yes
+MaxConnections=50
+MaxConnectionsPerSource=10
+
+[Install]
+WantedBy=sockets.target

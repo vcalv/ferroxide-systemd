@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 
-	"github.com/emersion/hydroxide/config"
-	"github.com/emersion/hydroxide/protonmail"
+	"github.com/vcalv/ferroxide-systemd/config"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
 )
 
 var ErrNotFound = errors.New("message not found in local database")

@@ -2,8 +2,8 @@ image: archlinux
 packages:
   - go
 sources:
-  - https://github.com/emersion/hydroxide.git
+  - https://github.com/vcalv/ferroxide-systemd.git
 tasks:
   - build: |
-      cd hydroxide
+      cd ferroxide
       go build -v ./...

@@ -1,0 +1,20 @@
+[Unit]
+Description=ferroxide SMTP oneshot server
+
+[Service]
+User=ferroxide
+Group=ferroxide
+EnvironmentFile=-/etc/ferroxide.conf
+ExecStart=-/usr/bin/ferroxide --config-home /var/lib/ systemd smtp
+StandardInput=socket
+StandardError=journal
+
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectSystem=yes
+ProtectHome=yes
+
+#MemoryHigh=5M
+#MemoryMax=10M
+#TasksAccounting=yes
+#TasksMax=3

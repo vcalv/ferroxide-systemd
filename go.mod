@@ -1,18 +1,29 @@
-module github.com/emersion/hydroxide
+module github.com/vcalv/ferroxide-systemd
 
-go 1.13
+go 1.23.0
+
+toolchain go1.24.2
 
 require (
-	github.com/ProtonMail/go-crypto v0.0.0-20230717121422-5aa5874ade95
-	github.com/boltdb/bolt v1.3.1
+	github.com/ProtonMail/go-crypto v1.2.0
 	github.com/emersion/go-bcrypt v0.0.0-20170822072041-6e724a1baa63
+	github.com/emersion/go-ical v0.0.0-20240127095438-fc1c9d8fb2b6
 	github.com/emersion/go-imap v1.2.1
 	github.com/emersion/go-mbox v1.0.3
-	github.com/emersion/go-message v0.16.0
-	github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead // indirect
-	github.com/emersion/go-smtp v0.18.0
-	github.com/emersion/go-vcard v0.0.0-20230815062825-8fda7d206ec9
-	github.com/emersion/go-webdav v0.3.2-0.20220524091811-5d845721d8f7
-	golang.org/x/crypto v0.12.0
-	golang.org/x/term v0.11.0
+	github.com/emersion/go-message v0.18.2
+	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6
+	github.com/emersion/go-smtp v0.21.3
+	github.com/emersion/go-vcard v0.0.0-20241024213814-c9703dde27ff
+	github.com/emersion/go-webdav v0.6.0
+	github.com/google/uuid v1.6.0
+	go.etcd.io/bbolt v1.4.0
+	golang.org/x/crypto v0.37.0
+	golang.org/x/term v0.31.0
+)
+
+require (
+	github.com/cloudflare/circl v1.6.1 // indirect
+	github.com/teambition/rrule-go v1.8.2 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 )

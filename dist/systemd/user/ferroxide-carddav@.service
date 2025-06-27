@@ -1,0 +1,18 @@
+[Unit]
+Description=ferroxide CardDAV oneshot server
+
+[Service]
+EnvironmentFile=-%h/.config/ferroxide/environment.conf
+ExecStart=-/usr/bin/ferroxide systemd carddav
+StandardInput=socket
+StandardError=journal
+
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectSystem=yes
+#ProtectHome=yes
+
+#MemoryHigh=5M
+#MemoryMax=10M
+#TasksAccounting=yes
+#TasksMax=3

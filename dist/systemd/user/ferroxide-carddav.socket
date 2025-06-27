@@ -1,0 +1,12 @@
+[Unit]
+Description=Ferroxide CardDav oneshot server
+
+[Socket]
+ListenStream=8080
+Accept=yes
+ReusePort=yes
+MaxConnections=50
+MaxConnectionsPerSource=10
+
+[Install]
+WantedBy=sockets.target

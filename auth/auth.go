@@ -13,8 +13,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/crypto/nacl/secretbox"
 
-	"github.com/emersion/hydroxide/config"
-	"github.com/emersion/hydroxide/protonmail"
+	"github.com/vcalv/ferroxide-systemd/config"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
 )
 
 func authFilePath() (string, error) {
@@ -152,7 +152,7 @@ func ListUsernames() ([]string, error) {
 	}
 
 	l := make([]string, 0, len(auths))
-	for username, _ := range auths {
+	for username := range auths {
 		l = append(l, username)
 	}
 	return l, nil
@@ -173,7 +173,7 @@ type session struct {
 	privateKeys     openpgp.EntityList
 }
 
-var ErrUnauthorized = errors.New("Invalid username or password")
+var ErrUnauthorized = errors.New("invalid username or password")
 
 type Manager struct {
 	newClient func() *protonmail.Client

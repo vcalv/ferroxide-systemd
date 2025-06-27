@@ -12,10 +12,10 @@ import (
 	"github.com/emersion/go-message/mail"
 	"github.com/emersion/go-message/textproto"
 
-	"github.com/emersion/hydroxide/protonmail"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
 )
 
-func writeMessage(c *protonmail.Client, privateKeys openpgp.KeyRing, w io.Writer, msg *protonmail.Message) error {
+func writeMessage(_ *protonmail.Client, privateKeys openpgp.KeyRing, w io.Writer, msg *protonmail.Message) error {
 	mimeType := msg.MIMEType
 	if mimeType == "" {
 		mimeType = "text/html"
