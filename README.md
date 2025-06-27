@@ -3,9 +3,48 @@
 A community fork of [emersion/ferroxide](https://github.com/emersion/ferroxide)
 
 Primary changes:
-- Caldav
+- CalDAV
 - Tor and proxies
 - Custom config directory
+- Systemd socket support
+
+# Systemd socket usage
+
+The systemd socket and service files can be found under the directory `dist`.
+Using these you can basically run the services on demand.
+If no one is connected to them, no resources are used but when someone connects to the service port it's automatically started.
+
+You also gain a lot of security measure related to process isolation.
+I still would not expose these services to the world.
+Bind to localhost or an interface behind a firewall/VPN.
+
+If you chose to use the system socket services (best option) you'll need to log into your protonmail account but under the `ferroxide` Linux user.
+
+simplest way is:
+
+    sudo -u ferroxide ferroxide --config-home /var/lib/ email@protonmail.com
+
+Or copy your auth data at `$HOME/.config/ferroxide/auth.json` to `/var/lib/ferroxide/auth.json`
+
+The services can be started as usual with
+
+    sudo systemctl start ferroxide-{imap,smtp,etc}.socket
+
+Or you can just enable them by default.
+
+    sudo systemctl enable ferroxide-{imap,smtp,etc}.socket
+
+If you want to bind to different ports or other customizations use
+
+    sudo systemctl edit ferroxide-{imap,smtp,etc}.socket
+
+And change what you want.
+
+Environment variables can be set in `/etc/ferroxide.conf`.
+
+if you use the user systemd services don't forget to use the `--user` flag in the previous comments.
+
+The service will then run with your own user, with all the potential problems from the lack of isolation.
 
 # Original Hydroxide ReadMe
 
@@ -46,7 +85,7 @@ setup information.
 Start by installing ferroxide:
 
 ```shell
-go install github.com/acheong08/ferroxide/cmd/ferroxide@latest
+go install github.com/vcalv/ferroxide-systemd/cmd/ferroxide@latest
 ```
 
 Then you'll need to login to ProtonMail via ferroxide, so that ferroxide can
