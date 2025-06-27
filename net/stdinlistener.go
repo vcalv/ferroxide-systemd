@@ -33,7 +33,7 @@ func (l *StdinStdoutListener) Accept() (net.Conn, error) {
 func (l *StdinStdoutListener) Close() error {
 	// Closing stdin/stdout is not necessary for this use case
 	cond.Signal()
-	cond.L.Unlock()
+	//cond.L.Unlock()
 	return nil
 }
 
