@@ -2,16 +2,15 @@
 Description=ferroxide IMAP oneshot server
 
 [Service]
-User=ferroxide
-Group=ferroxide
-ExecStart=-/usr/bin/ferroxide --config-home /var/lib/ systemd imap
+EnvironmentFile=-%h/.config/ferroxide/environment.conf
+ExecStart=-/usr/bin/ferroxide systemd imap
 StandardInput=socket
 StandardError=journal
 
 PrivateTmp=yes
 NoNewPrivileges=yes
 ProtectSystem=yes
-ProtectHome=yes
+#ProtectHome=yes
 
 #MemoryHigh=5M
 #MemoryMax=10M

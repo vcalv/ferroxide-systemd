@@ -1,17 +1,16 @@
 [Unit]
-Description=ferroxide SMTP oneshot server
+Description=ferroxide CalDAV oneshot server
 
 [Service]
-User=ferroxide
-Group=ferroxide
-ExecStart=-/usr/bin/ferroxide --config-home /var/lib/ systemd smtp
+EnvironmentFile=-%h/.config/ferroxide/environment.conf
+ExecStart=-/usr/bin/ferroxide systemd caldav
 StandardInput=socket
 StandardError=journal
 
 PrivateTmp=yes
 NoNewPrivileges=yes
 ProtectSystem=yes
-ProtectHome=yes
+#ProtectHome=yes
 
 #MemoryHigh=5M
 #MemoryMax=10M

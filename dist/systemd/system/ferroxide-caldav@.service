@@ -4,6 +4,7 @@ Description=ferroxide CalDAV oneshot server
 [Service]
 User=ferroxide
 Group=ferroxide
+EnvironmentFile=-/etc/ferroxide.conf
 ExecStart=-/usr/bin/ferroxide --config-home /var/lib/ systemd caldav
 StandardInput=socket
 StandardError=journal

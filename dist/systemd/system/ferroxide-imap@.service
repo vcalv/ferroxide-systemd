@@ -1,10 +1,11 @@
 [Unit]
-Description=ferroxide CardDAV oneshot server
+Description=ferroxide IMAP oneshot server
 
 [Service]
 User=ferroxide
 Group=ferroxide
-ExecStart=-/usr/bin/ferroxide --config-home /var/lib/ systemd carddav
+EnvironmentFile=-/etc/ferroxide.conf
+ExecStart=-/usr/bin/ferroxide --config-home /var/lib/ systemd imap
 StandardInput=socket
 StandardError=journal
 
