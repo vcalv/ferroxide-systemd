@@ -2,7 +2,7 @@ image: archlinux
 packages:
   - go
 sources:
-  - https://github.com/acheong08/ferroxide.git
+  - https://github.com/vcalv/ferroxide-systemd.git
 tasks:
   - build: |
       cd ferroxide

@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/ProtonMail/go-crypto/openpgp"
-	"github.com/acheong08/ferroxide/protonmail"
-	"github.com/acheong08/ferroxide/utils"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
+	"github.com/vcalv/ferroxide-systemd/utils"
 	"github.com/emersion/go-ical"
 	"github.com/emersion/go-webdav/caldav"
 )

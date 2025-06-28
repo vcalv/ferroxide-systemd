@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -20,17 +21,18 @@ import (
 	"github.com/emersion/go-smtp"
 	"golang.org/x/term"
 
-	"github.com/acheong08/ferroxide/auth"
-	"github.com/acheong08/ferroxide/caldav"
-	"github.com/acheong08/ferroxide/carddav"
-	"github.com/acheong08/ferroxide/config"
-	"github.com/acheong08/ferroxide/events"
-	"github.com/acheong08/ferroxide/exports"
-	imapbackend "github.com/acheong08/ferroxide/imap"
-	"github.com/acheong08/ferroxide/imports"
-	"github.com/acheong08/ferroxide/protonmail"
-	smtpbackend "github.com/acheong08/ferroxide/smtp"
 	"github.com/google/uuid"
+	"github.com/vcalv/ferroxide-systemd/auth"
+	"github.com/vcalv/ferroxide-systemd/caldav"
+	"github.com/vcalv/ferroxide-systemd/carddav"
+	"github.com/vcalv/ferroxide-systemd/config"
+	"github.com/vcalv/ferroxide-systemd/events"
+	"github.com/vcalv/ferroxide-systemd/exports"
+	imapbackend "github.com/vcalv/ferroxide-systemd/imap"
+	"github.com/vcalv/ferroxide-systemd/imports"
+	stdinlistener "github.com/vcalv/ferroxide-systemd/net"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
+	smtpbackend "github.com/vcalv/ferroxide-systemd/smtp"
 )
 
 const (
@@ -121,7 +123,7 @@ func askPass(prompt string) ([]byte, error) {
 }
 
 func askBridgePass() (string, error) {
-	if v := os.Getenv("HYDROXIDE_BRIDGE_PASS"); v != "" {
+	if v := os.Getenv("FERROXIDE_BRIDGE_PASS"); v != "" {
 		return v, nil
 	}
 	b, err := askPass("Bridge password")
@@ -167,7 +169,7 @@ func listenAndServeIMAP(addr string, debug bool, authManager *auth.Manager, even
 	return s.ListenAndServe()
 }
 
-func listenAndServeCalDAV(addr string, authManager *auth.Manager, eventsManager *events.Manager, tlsConfig *tls.Config) error {
+func listenAndServeCalDAV(addr string, authManager *auth.Manager, eventsManager *events.Manager, tlsConfig *tls.Config, listener net.Listener) error {
 	handlers := make(map[string]http.Handler)
 
 	s := &http.Server{
@@ -207,11 +209,15 @@ func listenAndServeCalDAV(addr string, authManager *auth.Manager, eventsManager 
 		}),
 	}
 
-	log.Println("CalDAV server listening on", s.Addr)
-	return s.ListenAndServe()
+	if listener == nil {
+		log.Println("CalDAV server listening on", s.Addr)
+		return s.ListenAndServe()
+	} else {
+		return s.Serve(listener)
+	}
 }
 
-func listenAndServeCardDAV(addr string, authManager *auth.Manager, eventsManager *events.Manager, tlsConfig *tls.Config) error {
+func listenAndServeCardDAV(addr string, authManager *auth.Manager, eventsManager *events.Manager, tlsConfig *tls.Config, listener net.Listener) error {
 	handlers := make(map[string]http.Handler)
 
 	s := &http.Server{
@@ -251,13 +257,17 @@ func listenAndServeCardDAV(addr string, authManager *auth.Manager, eventsManager
 		}),
 	}
 
-	if s.TLSConfig != nil {
-		log.Println("CardDAV server listening with TLS on", s.Addr)
-		return s.ListenAndServeTLS("", "")
+	if listener == nil {
+		if s.TLSConfig != nil {
+			log.Println("CardDAV server listening with TLS on", s.Addr)
+			return s.ListenAndServeTLS("", "")
+		} else {
+			log.Println("CardDAV server listening on", s.Addr)
+			return s.ListenAndServe()
+		}
+	} else {
+		return s.Serve(listener)
 	}
-
-	log.Println("CardDAV server listening on", s.Addr)
-	return s.ListenAndServe()
 }
 
 func isMbox(br *bufio.Reader) (bool, error) {
@@ -282,9 +292,10 @@ Commands:
 	serve			Run all servers
 	smtp			Run ferroxide as an SMTP server
 	status			View ferroxide status
+	systemd	<server>	Run server (carddav, caldav, imap or smtp) as a systemd socket service
 
 Environment variables:
-	HYDROXIDE_BRIDGE_PASS	Don't prompt for the bridge password, use this variable instead
+	FERROXIDE_BRIDGE_PASS	Don't prompt for the bridge password, use this variable instead
 
 `
 
@@ -591,12 +602,12 @@ func main() {
 		addr := *caldavHost + ":" + *caldavPort
 		authManager := auth.NewManager(newClient)
 		eventsManager := events.NewManager()
-		log.Fatal(listenAndServeCalDAV(addr, authManager, eventsManager, tlsConfig))
+		log.Fatal(listenAndServeCalDAV(addr, authManager, eventsManager, tlsConfig, nil))
 	case "carddav":
-		addr := *caldavHost + ":" + *caldavPort
+		addr := *carddavHost + ":" + *carddavPort
 		authManager := auth.NewManager(newClient)
 		eventsManager := events.NewManager()
-		log.Fatal(listenAndServeCardDAV(addr, authManager, eventsManager, tlsConfig))
+		log.Fatal(listenAndServeCardDAV(addr, authManager, eventsManager, tlsConfig, nil))
 	case "serve":
 		smtpAddr := *smtpHost + ":" + *smtpPort
 		imapAddr := *imapHost + ":" + *imapPort
@@ -619,12 +630,12 @@ func main() {
 		}
 		if !*disableCardDAV {
 			go func() {
-				done <- listenAndServeCardDAV(carddavAddr, authManager, eventsManager, tlsConfig)
+				done <- listenAndServeCardDAV(carddavAddr, authManager, eventsManager, tlsConfig, nil)
 			}()
 		}
 		if !*disableCalDAV {
 			go func() {
-				done <- listenAndServeCalDAV(caldavAddr, authManager, eventsManager, tlsConfig)
+				done <- listenAndServeCalDAV(caldavAddr, authManager, eventsManager, tlsConfig, nil)
 			}()
 		}
 		log.Fatal(<-done)
@@ -663,6 +674,35 @@ func main() {
 		err = smtpbackend.SendMail(c, u, privateKeys, addrs, rcpt, os.Stdin)
 		if err != nil {
 			log.Fatal(err)
+		}
+	case "systemd":
+		systemd_cmd := flag.Arg(1)
+
+		authManager := auth.NewManager(newClient)
+		eventsManager := events.NewManager()
+		listener := stdinlistener.StdinStdoutListener{}
+		log.SetFlags(0)
+
+		switch systemd_cmd {
+		case "imap":
+			log.Println("Running IMAP in stdin/stdout")
+			be := imapbackend.New(authManager, eventsManager)
+			s := imapserver.New(be)
+			s.AllowInsecureAuth = tlsConfig == nil // TODO TLS support
+			log.Fatal(s.Serve(&listener))
+		case "smtp":
+			log.Println("Running SMTP in stdin/stdout")
+			be := smtpbackend.New(authManager)
+			s := smtp.NewServer(be)
+			log.Fatal(s.Serve(&listener))
+		case "caldav":
+			log.Println("Running CalDAV in stdin/stdout")
+			log.Fatal(listenAndServeCalDAV("", authManager, eventsManager, tlsConfig, &listener))
+		case "carddav":
+			log.Println("Running CardDAV in stdin/stdout")
+			log.Fatal(listenAndServeCardDAV("", authManager, eventsManager, tlsConfig, &listener))
+		default:
+			fmt.Printf("Unknown server type \"%s\" to run in stdin/stdout\n", systemd_cmd)
 		}
 	default:
 		fmt.Print(usage)

@@ -6,8 +6,8 @@ import (
 
 	bolt "go.etcd.io/bbolt"
 
-	"github.com/acheong08/ferroxide/config"
-	"github.com/acheong08/ferroxide/protonmail"
+	"github.com/vcalv/ferroxide-systemd/config"
+	"github.com/vcalv/ferroxide-systemd/protonmail"
 )
 
 var ErrNotFound = errors.New("message not found in local database")
