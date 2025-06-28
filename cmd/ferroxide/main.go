@@ -130,7 +130,7 @@ func askBridgePass() (string, error) {
 	return string(b), err
 }
 
-func listenAndServeSMTP(addr string, debug bool, authManager *auth.Manager, tlsConfig *tls.Config) error {
+func listenAndServeSMTP(addr string, debug bool, authManager *auth.Manager, tlsConfig *tls.Config, listener net.Listener) error {
 	be := smtpbackend.New(authManager)
 	s := smtp.NewServer(be)
 	s.Addr = addr
@@ -146,11 +146,15 @@ func listenAndServeSMTP(addr string, debug bool, authManager *auth.Manager, tlsC
 		return s.ListenAndServeTLS()
 	}
 
-	log.Println("SMTP server listening on", s.Addr)
-	return s.ListenAndServe()
+	if listener == nil {
+		log.Println("SMTP server listening on", s.Addr)
+		return s.ListenAndServe()
+	} else {
+		return s.Serve(listener)
+	}
 }
 
-func listenAndServeIMAP(addr string, debug bool, authManager *auth.Manager, eventsManager *events.Manager, tlsConfig *tls.Config) error {
+func listenAndServeIMAP(addr string, debug bool, authManager *auth.Manager, eventsManager *events.Manager, tlsConfig *tls.Config, listener net.Listener) error {
 	be := imapbackend.New(authManager, eventsManager)
 	s := imapserver.New(be)
 	s.Addr = addr
@@ -165,8 +169,12 @@ func listenAndServeIMAP(addr string, debug bool, authManager *auth.Manager, even
 		return s.ListenAndServeTLS()
 	}
 
-	log.Println("IMAP server listening on", s.Addr)
-	return s.ListenAndServe()
+	if listener == nil {
+		log.Println("IMAP server listening on", s.Addr)
+		return s.ListenAndServe()
+	} else {
+		return s.Serve(listener)
+	}
 }
 
 func listenAndServeCalDAV(addr string, authManager *auth.Manager, eventsManager *events.Manager, tlsConfig *tls.Config, listener net.Listener) error {
@@ -592,12 +600,12 @@ func main() {
 	case "smtp":
 		addr := *smtpHost + ":" + *smtpPort
 		authManager := auth.NewManager(newClient)
-		log.Fatal(listenAndServeSMTP(addr, debug, authManager, tlsConfig))
+		log.Fatal(listenAndServeSMTP(addr, debug, authManager, tlsConfig, nil))
 	case "imap":
 		addr := *imapHost + ":" + *imapPort
 		authManager := auth.NewManager(newClient)
 		eventsManager := events.NewManager()
-		log.Fatal(listenAndServeIMAP(addr, debug, authManager, eventsManager, tlsConfig))
+		log.Fatal(listenAndServeIMAP(addr, debug, authManager, eventsManager, tlsConfig, nil))
 	case "caldav":
 		addr := *caldavHost + ":" + *caldavPort
 		authManager := auth.NewManager(newClient)
@@ -620,12 +628,12 @@ func main() {
 		done := make(chan error, 3)
 		if !*disableSMTP {
 			go func() {
-				done <- listenAndServeSMTP(smtpAddr, debug, authManager, tlsConfig)
+				done <- listenAndServeSMTP(smtpAddr, debug, authManager, tlsConfig, nil)
 			}()
 		}
 		if !*disableIMAP {
 			go func() {
-				done <- listenAndServeIMAP(imapAddr, debug, authManager, eventsManager, tlsConfig)
+				done <- listenAndServeIMAP(imapAddr, debug, authManager, eventsManager, tlsConfig, nil)
 			}()
 		}
 		if !*disableCardDAV {
@@ -686,15 +694,10 @@ func main() {
 		switch systemd_cmd {
 		case "imap":
 			log.Println("Running IMAP in stdin/stdout")
-			be := imapbackend.New(authManager, eventsManager)
-			s := imapserver.New(be)
-			s.AllowInsecureAuth = tlsConfig == nil // TODO TLS support
-			log.Fatal(s.Serve(&listener))
+			log.Fatal(listenAndServeIMAP("", false, authManager, eventsManager, tlsConfig, &listener))
 		case "smtp":
 			log.Println("Running SMTP in stdin/stdout")
-			be := smtpbackend.New(authManager)
-			s := smtp.NewServer(be)
-			log.Fatal(s.Serve(&listener))
+			log.Fatal(listenAndServeSMTP("", false, authManager, tlsConfig, &listener))
 		case "caldav":
 			log.Println("Running CalDAV in stdin/stdout")
 			log.Fatal(listenAndServeCalDAV("", authManager, eventsManager, tlsConfig, &listener))
